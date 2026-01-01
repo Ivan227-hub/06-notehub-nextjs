@@ -1,5 +1,6 @@
 import axios from "axios";
 import { Note } from "@/types/note";
+import { notFound } from "next/navigation";
 
 const api = axios.create({
   baseURL: "https://notehub-public.goit.study/api",
@@ -14,6 +15,12 @@ export const fetchNotes = async (): Promise<Note[]> => {
 };
 
 export const fetchNoteById = async (id: string): Promise<Note> => {
-  const { data } = await api.get(`/notes/${id}`);
-  return data;
+  try {
+    const { data } = await api.get(`/notes/${id}`);
+    if (!data.note) notFound();
+    return data.note;
+  } catch (err: unknown) {
+    if (axios.isAxiosError(err) && err.response?.status === 404) notFound();
+    throw err;
+  }
 };
