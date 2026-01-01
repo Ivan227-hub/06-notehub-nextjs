@@ -8,11 +8,8 @@ const api = axios.create({
   },
 });
 
-export const fetchNotes = async (query = ""): Promise<Note[]> => {
-  const { data } = await api.get("/notes", {
-    params: { search: query },
-  });
-
+export const fetchNotes = async (): Promise<Note[]> => {
+  const { data } = await api.get("/notes");
   return data.notes;
 };
 
