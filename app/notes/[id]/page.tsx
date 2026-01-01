@@ -1,24 +1,22 @@
-import Link from "next/link";
-import { Note } from "@/types/note";
-import css from "./NoteList.module.css";
+import { dehydrate, QueryClient } from "@tanstack/react-query";
+import { fetchNoteById } from "@/lib/api";
+import NoteDetailsClient from "./NoteDetails.client";
 
-export default function NoteList({ notes }: { notes: Note[] }) {
+interface NotePageProps {
+  params: { id: string };
+}
+
+export default async function NotePage({ params }: NotePageProps) {
+  const queryClient = new QueryClient();
+
+  // prefetch для SSR + гидратация кеша
+  await queryClient.prefetchQuery({
+  queryKey: ["note", params.id],
+  queryFn: () => fetchNoteById(params.id),
+});
+
+
   return (
-    <ul className={css.list}>
-      {notes.map(note => (
-        <li key={note.id} className={css.listItem}>
-          <h3 className={css.title}>{note.title}</h3>
-          <p className={css.content}>{note.content}</p>
-
-          <div className={css.footer}>
-            {note.tag && <span className={css.tag}>{note.tag}</span>}
-
-            <Link href={`/notes/${note.id}`} className={css.link}>
-              View details
-            </Link>
-          </div>
-        </li>
-      ))}
-    </ul>
+    <NoteDetailsClient id={params.id} dehydratedState={dehydrate(queryClient)} />
   );
 }
