@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { fetchNoteById } from "../../../lib/api"; 
+import { fetchNoteById } from "../../../../lib/api"; 
 
 export async function GET(
   req: NextRequest,
