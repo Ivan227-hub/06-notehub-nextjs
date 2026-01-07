@@ -1,18 +1,17 @@
-import { NextRequest, NextResponse } from "next/server";
-import { fetchNoteById } from "../../../../lib/api"; 
+import { NextResponse, NextRequest } from "next/server";
+// Используем относительные пути, чтобы точно сработало
+import { fetchNoteById } from "../../../../lib/api";
+import { Note } from "../../../../types/note";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const note = await fetchNoteById(params.id);
-    if (!note) {
-      return NextResponse.json({ error: "Not found" }, { status: 404 });
-    }
+    const { id } = await params;
+    const note: Note = await fetchNoteById(id);
     return NextResponse.json(note);
-  } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : "Internal Server Error";
-    return NextResponse.json({ error: message }, { status: 500 });
+  } catch {
+    return NextResponse.json({ error: "Note not found" }, { status: 404 });
   }
 }
