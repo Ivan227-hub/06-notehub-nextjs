@@ -5,8 +5,8 @@ import {
   HydrationBoundary,
   type DehydratedState,
 } from "@tanstack/react-query";
-import { fetchNoteById } from "@/lib/api";
-import { Note } from "@/types/note";
+import { fetchNoteById } from "../../../lib/api";
+import { Note } from "../../../types/note";
 import css from "./NoteDetails.module.css";
 
 interface Props {

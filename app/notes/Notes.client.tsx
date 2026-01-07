@@ -1,10 +1,10 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { fetchNotes } from "@/lib/api";
-import NoteList from "@/components/NoteList/NoteList";
+import { fetchNotes } from "../../lib/api";
+import NoteList from "../../components/NoteList/NoteList";
 import css from "./NotesPage.module.css";
-import { Note } from "@/types/note";
+import { Note } from "../../types/note";
 
 export default function NotesClient() {
   const { data, isLoading, error } = useQuery<Note[]>({
