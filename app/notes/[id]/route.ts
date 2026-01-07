@@ -1,12 +1,18 @@
-// app/api/notes/[id]/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { notes, Note } from "../../../lib/api"; // <-- используем api.ts, а не data.ts
+import { fetchNoteById } from "../../../lib/api"; 
 
 export async function GET(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const note = notes.find((n: Note) => n.id === parseInt(params.id));
-  if (!note) return NextResponse.json({ error: "Not found" }, { status: 404 });
-  return NextResponse.json(note);
+  try {
+    const note = await fetchNoteById(params.id);
+    if (!note) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+    return NextResponse.json(note);
+  } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Internal Server Error";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
 }
