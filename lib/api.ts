@@ -1,7 +1,10 @@
 import axios from "axios";
-import { Note, FetchNotesResponse } from "../types/note";
+import { Note } from "../types/note";
 
-export type { FetchNotesResponse }; // <-- добавь это!
+export interface FetchNotesResponse {
+  notes: Note[];
+  totalPages: number;
+}
 
 const api = axios.create({
   baseURL: "https://notehub-public.goit.study/api",
@@ -10,6 +13,7 @@ const api = axios.create({
   },
 });
 
+// Получение списка заметок
 export const fetchNotes = async (
   page: number = 1,
   search: string = ""
@@ -20,20 +24,23 @@ export const fetchNotes = async (
   return data;
 };
 
-export const fetchNoteById = async (id: string): Promise<Note> => {
+// Получение заметки по id
+export const fetchNoteById = async (id: string) => {
   const { data } = await api.get<Note>(`/notes/${id}`);
   return data;
 };
 
+// Создание заметки
 export const createNote = async (note: {
   title: string;
   content: string;
   tag: string;
-}): Promise<Note> => {
+}) => {
   const { data } = await api.post<Note>("/notes", note);
   return data;
 };
 
-export const deleteNote = async (id: string): Promise<void> => {
+// Удаление заметки
+export const deleteNote = async (id: string) => {
   await api.delete(`/notes/${id}`);
 };

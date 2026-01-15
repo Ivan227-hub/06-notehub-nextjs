@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { dehydrate, QueryClient } from "@tanstack/react-query";
-import { fetchNotes, fetchNoteById, FetchNotesResponse } from "../../../lib/api";
+import { fetchNotes, fetchNoteById } from "../../../lib/api";
 import NoteDetailsClient from "./NoteDetails.client";
 
 interface Props {
@@ -10,14 +10,16 @@ interface Props {
 export default async function NotePage({ params }: Props) {
   const queryClient = new QueryClient();
 
+  // Предварительная загрузка списка заметок
   await queryClient.prefetchQuery({
     queryKey: ["notes", 1, ""],
     queryFn: ({ queryKey }) => {
-      const [_key, page, search] = queryKey as [string, number, string];
+      const [, page, search] = queryKey as [string, number, string]; // заменили key на _
       return fetchNotes(page, search);
     },
   });
 
+  // Предварительная загрузка конкретной заметки
   try {
     await queryClient.prefetchQuery({
       queryKey: ["note", params.id],
