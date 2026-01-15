@@ -6,12 +6,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createNote } from "../../lib/api";
 import css from "./NoteForm.module.css";
 
-interface NoteFormValues {
-  title: string;
-  content: string;
-  tag: string;
-}
-
 interface NoteFormProps {
   onClose: () => void;
 }
@@ -34,10 +28,10 @@ export default function NoteForm({ onClose }: NoteFormProps) {
   });
 
   return (
-    <Formik<NoteFormValues>
+    <Formik
       initialValues={{ title: "", content: "", tag: "work" }}
       validationSchema={schema}
-      onSubmit={(values: NoteFormValues) => mutation.mutate(values)}
+      onSubmit={values => mutation.mutate(values)}
     >
       <Form className={css.form}>
         <Field name="title" placeholder="Title" />
