@@ -1,21 +1,36 @@
 import Link from "next/link";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { deleteNote } from "../../lib/api";
 import { Note } from "../../types/note";
 import css from "./NoteList.module.css";
 
-export default function NoteList({ notes }: { notes: Note[] }) {
+interface NoteListProps {
+  notes: Note[];
+}
+
+export default function NoteList({ notes }: NoteListProps) {
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: deleteNote,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notes"] });
+    },
+  });
+
   return (
     <ul className={css.list}>
       {notes.map(note => (
         <li key={note.id} className={css.listItem}>
-          <h3 className={css.title}>{note.title}</h3>
-          <p className={css.content}>{note.content}</p>
+          <h3>{note.title}</h3>
+          <p>{note.content}</p>
+          <span className={css.tag}>{note.tag}</span>
 
-          <div className={css.footer}>
-            {note.tag && <span className={css.tag}>{note.tag}</span>}
-
-            <Link href={`/notes/${note.id}`} className={css.link}>
-              View details
-            </Link>
+          <div>
+            <Link href={`/notes/${note.id}`}>View</Link>
+            <button onClick={() => mutation.mutate(note.id)}>
+              Delete
+            </button>
           </div>
         </li>
       ))}

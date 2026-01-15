@@ -4,48 +4,26 @@ import { fetchNoteById } from "../../../lib/api";
 import NoteDetailsClient from "./NoteDetails.client";
 
 interface Props {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default async function NotePage({ params }: Props) {
+  const { id } = await params;
+
   const queryClient = new QueryClient();
 
-  
-  let noteExists = true;
-
   try {
-    
     await queryClient.prefetchQuery({
-      queryKey: ["note", params.id],
-      queryFn: () => fetchNoteById(params.id),
+      queryKey: ["note", id],
+      queryFn: () => fetchNoteById(id),
     });
-
-    const note = queryClient.getQueryData(["note", params.id]);
-
-    
-    if (!note) {
-      noteExists = false;
-    }
-  } catch (error) {
-    console.error("Ошибка при загрузке заметки:", error);
-    
+  } catch {
     notFound();
   }
 
-  
-  if (!noteExists) {
-    return (
-      <div style={{ padding: "2rem", textAlign: "center" }}>
-        <h2>Заметка не найдена</h2>
-        <p>Проверьте правильность URL или выберите другую заметку.</p>
-      </div>
-    );
-  }
-
-  
   return (
     <NoteDetailsClient
-      id={params.id}
+      id={id}
       dehydratedState={dehydrate(queryClient)}
     />
   );

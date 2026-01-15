@@ -1,46 +1,65 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createNote } from "../../lib/api";
 import css from "./NoteForm.module.css";
 
-interface NoteFormProps {
-  onSubmit: (title: string, content: string) => void;
+interface NoteFormValues {
+  title: string;
+  content: string;
+  tag: string;
 }
 
-export default function NoteForm({ onSubmit }: NoteFormProps) {
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+interface NoteFormProps {
+  onClose: () => void;
+}
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
+const schema = Yup.object({
+  title: Yup.string().required("Required"),
+  content: Yup.string().required("Required"),
+  tag: Yup.string().required("Required"),
+});
 
-    if (!title.trim() || !content.trim()) return;
+export default function NoteForm({ onClose }: NoteFormProps) {
+  const queryClient = useQueryClient();
 
-    onSubmit(title, content);
-    setTitle("");
-    setContent("");
-  };
+  const mutation = useMutation({
+    mutationFn: createNote,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notes"] });
+      onClose();
+    },
+  });
 
   return (
-    <form className={css.form} onSubmit={handleSubmit}>
-      <input
-        className={css.input}
-        type="text"
-        placeholder="Note title"
-        value={title}
-        onChange={e => setTitle(e.target.value)}
-      />
+    <Formik<NoteFormValues>
+      initialValues={{ title: "", content: "", tag: "work" }}
+      validationSchema={schema}
+      onSubmit={(values: NoteFormValues) => mutation.mutate(values)}
+    >
+      <Form className={css.form}>
+        <Field name="title" placeholder="Title" />
+        <ErrorMessage name="title" component="span" />
 
-      <textarea
-        className={css.textarea}
-        placeholder="Note content"
-        value={content}
-        onChange={e => setContent(e.target.value)}
-      />
+        <Field as="textarea" name="content" placeholder="Content" />
+        <ErrorMessage name="content" component="span" />
 
-      <button className={css.button} type="submit">
-        Add note
-      </button>
-    </form>
+        <Field as="select" name="tag">
+          <option value="work">Work</option>
+          <option value="personal">Personal</option>
+          <option value="other">Other</option>
+        </Field>
+        <ErrorMessage name="tag" component="span" />
+
+        <div className={css.actions}>
+          <button type="submit">Create</button>
+          <button type="button" onClick={onClose}>
+            Cancel
+          </button>
+        </div>
+      </Form>
+    </Formik>
   );
 }
