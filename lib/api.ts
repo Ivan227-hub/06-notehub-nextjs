@@ -1,6 +1,5 @@
 import axios from "axios";
 import { Note } from "../types/note";
-import { QueryFunctionContext } from "@tanstack/react-query";
 
 export interface FetchNotesResponse {
   notes: Note[];
@@ -11,17 +10,45 @@ const api = axios.create({
   baseURL: "https://notehub-public.goit.study/api",
   headers: {
     Authorization: `Bearer ${process.env.NEXT_PUBLIC_NOTEHUB_TOKEN}`,
+    "Content-Type": "application/json",
   },
 });
 
-export const fetchNotes = async ({
-  queryKey,
-}: QueryFunctionContext<readonly [string, number, string]>): Promise<FetchNotesResponse> => {
-  const [, page, search] = queryKey; // ⬅️ key пропущен
-
+/* =======================
+   GET: список заметок
+======================= */
+export const fetchNotes = async (
+  page: number = 1,
+  search: string = ""
+): Promise<FetchNotesResponse> => {
   const { data } = await api.get<FetchNotesResponse>("/notes", {
     params: { page, search },
   });
 
   return data;
+};
+
+/* =======================
+   GET: заметка по ID
+======================= */
+export const fetchNoteById = async (id: string): Promise<Note> => {
+  const { data } = await api.get<Note>(`/notes/${id}`);
+  return data;
+};
+
+/* =======================
+   POST: создать заметку
+======================= */
+export const createNote = async (
+  note: Pick<Note, "title" | "content">
+): Promise<Note> => {
+  const { data } = await api.post<Note>("/notes", note);
+  return data;
+};
+
+/* =======================
+   DELETE: удалить заметку
+======================= */
+export const deleteNote = async (id: string): Promise<void> => {
+  await api.delete(`/notes/${id}`);
 };
