@@ -7,8 +7,11 @@ export default async function NotesPage() {
 
   // Предзагрузка заметок (page = 1, search = "")
   await queryClient.prefetchQuery({
-    queryKey: ["notes", 1, ""], // обязательно передаем page и search
-    queryFn: fetchNotes,
+    queryKey: ["notes", 1, ""], // page и search
+    queryFn: ({ queryKey }) => {
+      const [, page = 1, search = ""] = queryKey as [string, number, string];
+      return fetchNotes(page, search);
+    },
   });
 
   return (
