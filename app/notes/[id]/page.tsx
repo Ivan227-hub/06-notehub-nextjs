@@ -10,16 +10,16 @@ interface Props {
 export default async function NotePage({ params }: Props) {
   const queryClient = new QueryClient();
 
-  // Предварительная загрузка списка заметок
+ 
   await queryClient.prefetchQuery({
     queryKey: ["notes", 1, ""],
     queryFn: ({ queryKey }) => {
-      const [, page, search] = queryKey as [string, number, string]; // заменили key на _
+      const [, page, search] = queryKey as [string, number, string]; 
       return fetchNotes(page, search);
     },
   });
 
-  // Предварительная загрузка конкретной заметки
+  
   try {
     await queryClient.prefetchQuery({
       queryKey: ["note", params.id],
@@ -35,4 +35,7 @@ export default async function NotePage({ params }: Props) {
       dehydratedState={dehydrate(queryClient)}
     />
   );
+
+
 }
+

@@ -1,5 +1,5 @@
 import { NextResponse, NextRequest } from "next/server";
-// Используем относительные пути, чтобы точно сработало
+
 import { fetchNoteById } from "../../../../lib/api";
 import { Note } from "../../../../types/note";
 

@@ -6,7 +6,7 @@ import { useDebounce } from "use-debounce";
 
 import { fetchNotes, FetchNotesResponse } from "../../lib/api";
 import NoteList from "../../components/NoteList/NoteList";
-import Pagination from "../../components/Pagination/Pagination"; // <- убедись, что путь правильный
+import Pagination from "../../components/Pagination/Pagination";
 import SearchBox from "../../components/SearchBox/SearchBox";
 import Modal from "../../components/Modal/Modal";
 import NoteForm from "../../components/NoteForm/NoteForm";
@@ -20,14 +20,20 @@ export default function NotesClient() {
 
   const [debouncedSearch] = useDebounce(search, 500);
 
-  const { data, isLoading, error } = useQuery<FetchNotesResponse>({
-    queryKey: ["notes", page, debouncedSearch],
-    queryFn: ({ queryKey }) => {
-      const [, page, search] = queryKey as [string, number, string];
-      return fetchNotes(page, search);
-    },
-    placeholderData: { notes: [], totalPages: 0 },
-  });
+  // ✅ useQuery с tuple и корректной типизацией
+  const { data, isLoading, error } = useQuery<
+    FetchNotesResponse,
+    Error,
+    FetchNotesResponse,
+    readonly [string, number, string] // ключ tuple
+  >(
+    ["notes", page, debouncedSearch],
+    fetchNotes,
+    {
+      keepPreviousData: true,
+      placeholderData: { notes: [], totalPages: 0 },
+    }
+  );
 
   if (isLoading) return <p>Loading...</p>;
   if (error) return <p>Error loading notes</p>;
@@ -39,16 +45,15 @@ export default function NotesClient() {
         <button onClick={() => setIsModalOpen(true)}>Create note</button>
       </div>
 
-      {data?.notes.length === 0 ? (
+      {data.notes.length === 0 ? (
         <p>No notes found</p>
       ) : (
-        <NoteList notes={data?.notes ?? []} />
+        <NoteList notes={data.notes} />
       )}
 
-      {/* Pagination здесь */}
       <Pagination
         page={page}
-        totalPages={data?.totalPages ?? 0}
+        totalPages={data.totalPages}
         onPageChange={setPage}
       />
 
