@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useDebounce } from "use-debounce";
 
-import { fetchNotes, FetchNotesResponse } from "../../lib/api";
+import { fetchNotes } from "../../lib/api";
 import NoteList from "../../components/NoteList/NoteList";
 import Pagination from "../../components/Pagination/Pagination";
 import SearchBox from "../../components/SearchBox/SearchBox";
@@ -20,23 +20,23 @@ export default function NotesClient() {
 
   const [debouncedSearch] = useDebounce(search, 500);
 
-  // ✅ useQuery с tuple и корректной типизацией
-  const { data, isLoading, error } = useQuery<
-    FetchNotesResponse,
-    Error,
-    FetchNotesResponse,
-    readonly [string, number, string] // ключ tuple
-  >(
-    ["notes", page, debouncedSearch],
-    fetchNotes,
-    {
-      keepPreviousData: true,
-      placeholderData: { notes: [], totalPages: 0 },
-    }
-  );
+  const {
+    data,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["notes", page, debouncedSearch],
+    queryFn: () => fetchNotes(page, debouncedSearch),
+
+    // 🔑 ГАРАНТИЯ, что data НЕ undefined
+    initialData: {
+      notes: [],
+      totalPages: 0,
+    },
+  });
 
   if (isLoading) return <p>Loading...</p>;
-  if (error) return <p>Error loading notes</p>;
+  if (isError) return <p>Error loading notes</p>;
 
   return (
     <div className={css.app}>
