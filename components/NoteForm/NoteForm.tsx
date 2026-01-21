@@ -4,16 +4,29 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createNote } from "../../lib/api";
+import { Note } from "../../types/note";
 import css from "./NoteForm.module.css";
 
 interface NoteFormProps {
   onClose: () => void;
 }
 
+interface FormValues {
+  title: string;
+  content: string;
+  tag: Note["tag"];
+}
+
 const schema = Yup.object({
-  title: Yup.string().required("Required"),
-  content: Yup.string().required("Required"),
-  tag: Yup.string().required("Required"),
+  title: Yup.string().min(3).max(50).required("Required"),
+  content: Yup.string().max(500),
+  tag: Yup.mixed<FormValues["tag"]>().oneOf([
+    "Todo",
+    "Work",
+    "Personal",
+    "Meeting",
+    "Shopping",
+  ]),
 });
 
 export default function NoteForm({ onClose }: NoteFormProps) {
@@ -28,10 +41,15 @@ export default function NoteForm({ onClose }: NoteFormProps) {
   });
 
   return (
-    <Formik
-      initialValues={{ title: "", content: "", tag: "work" }}
+    <Formik<FormValues>
+      initialValues={{ title: "", content: "", tag: "Work" }}
       validationSchema={schema}
-      onSubmit={values => mutation.mutate(values)}
+      onSubmit={values =>
+        mutation.mutate({
+          ...values,
+          content: values.content || "",
+        })
+      }
     >
       <Form className={css.form}>
         <Field name="title" placeholder="Title" />
@@ -41,9 +59,11 @@ export default function NoteForm({ onClose }: NoteFormProps) {
         <ErrorMessage name="content" component="span" />
 
         <Field as="select" name="tag">
-          <option value="work">Work</option>
-          <option value="personal">Personal</option>
-          <option value="other">Other</option>
+          <option value="Todo">Todo</option>
+          <option value="Work">Work</option>
+          <option value="Personal">Personal</option>
+          <option value="Meeting">Meeting</option>
+          <option value="Shopping">Shopping</option>
         </Field>
         <ErrorMessage name="tag" component="span" />
 

@@ -3,11 +3,5 @@ export interface Note {
   title: string;
   content: string;
   createdAt: string;
-  updatedAt: string;
-  tag: string;
-}
-
-export interface FetchNotesResponse {
-  notes: Note[];
-  totalPages: number;
+  tag: "Todo" | "Work" | "Personal" | "Meeting" | "Shopping";
 }
