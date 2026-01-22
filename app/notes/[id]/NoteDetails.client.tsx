@@ -14,15 +14,19 @@ export default function NoteDetailsClient({ id }: Props) {
     queryFn: () => fetchNoteById(id),
   });
 
-  if (isLoading) return <p>Loading...</p>;
+  if (isLoading) return <p>Loading, please wait...</p>;
   if (isError || !data) return <p>Failed to load note</p>;
 
   return (
     <div className={css.container}>
-      <h2>{data.title}</h2>
-      <p>{data.content}</p>
-      <p>{data.tag}</p>
-      <p>{data.createdAt}</p>
+      <div className={css.item}>
+        <div className={css.header}>
+          <h2>{data.title}</h2>
+        </div>
+        <p className={css.content}>{data.content}</p>
+        <p className={css.date}>{data.createdAt}</p>
+        <p className={css.tag}>{data.tag}</p>
+      </div>
     </div>
   );
 }
