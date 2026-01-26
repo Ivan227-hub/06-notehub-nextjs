@@ -29,4 +29,6 @@ export default function NoteDetailsClient({ id }: Props) {
       </div>
     </div>
   );
+
+  
 }
