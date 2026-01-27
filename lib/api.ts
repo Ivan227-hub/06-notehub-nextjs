@@ -17,21 +17,22 @@ export const fetchNotes = async (
   page: number = 1,
   search: string = ""
 ): Promise<FetchNotesResponse> => {
-  const res = await api.get(`/notes?page=${page}&search=${search}`);
+  const res = await api.get<FetchNotesResponse>(
+    `/notes?page=${page}&search=${search}`
+  );
   return res.data;
 };
 
 export const fetchNoteById = async (id: string): Promise<Note> => {
-  const res = await api.get(`/notes/${id}`);
+  const res = await api.get<Note>(`/notes/${id}`);
   return res.data;
 };
 
-// ✅ добавляем createNote для формы
 export const createNote = async (note: {
   title: string;
   content: string;
   tag: Note["tag"];
 }): Promise<Note> => {
-  const res = await api.post("/notes", note);
+  const res = await api.post<Note>("/notes", note);
   return res.data;
 };

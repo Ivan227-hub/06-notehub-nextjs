@@ -12,6 +12,7 @@ export default function NoteDetailsClient({ id }: Props) {
   const { data, isLoading, isError } = useQuery({
     queryKey: ["note", id],
     queryFn: () => fetchNoteById(id),
+    refetchOnMount: false,
   });
 
   if (isLoading) return <p>Loading, please wait...</p>;
@@ -29,6 +30,4 @@ export default function NoteDetailsClient({ id }: Props) {
       </div>
     </div>
   );
-
-
 }

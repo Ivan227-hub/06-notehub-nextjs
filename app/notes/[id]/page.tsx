@@ -5,16 +5,17 @@ import css from "./NoteDetails.module.css";
 import { notFound } from "next/navigation";
 
 interface Props {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default async function NotePage({ params }: Props) {
+  const { id } = await params;
   const queryClient = new QueryClient();
 
   try {
     await queryClient.prefetchQuery({
-      queryKey: ["note", params.id],
-      queryFn: () => fetchNoteById(params.id),
+      queryKey: ["note", id],
+      queryFn: () => fetchNoteById(id),
     });
   } catch {
     notFound();
@@ -23,7 +24,7 @@ export default async function NotePage({ params }: Props) {
   return (
     <div className={css.container}>
       <HydrationBoundary state={dehydrate(queryClient)}>
-        <NoteDetailsClient id={params.id} />
+        <NoteDetailsClient id={id} />
       </HydrationBoundary>
     </div>
   );
