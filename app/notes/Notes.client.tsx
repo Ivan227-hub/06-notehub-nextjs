@@ -17,21 +17,28 @@ export default function NotesClient() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+
   const [debouncedSearch] = useDebounce(search, 500);
 
-  const { data, isLoading, isError } = useQuery({
+  const { data } = useQuery({
     queryKey: ["notes", page, debouncedSearch],
     queryFn: () => fetchNotes(page, debouncedSearch),
     placeholderData: keepPreviousData,
   });
 
-  if (isLoading) return <p>Loading, please wait...</p>;
-  if (isError || !data) return <p>Could not fetch the list of notes.</p>;
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    setPage(1); 
+  };
+
+  if (!data) {
+    return <p>Could not fetch the list of notes.</p>;
+  }
 
   return (
     <div className={css.app}>
       <div className={css.toolbar}>
-        <SearchBox value={search} onChange={setSearch} />
+        <SearchBox value={search} onChange={handleSearchChange} />
         <button onClick={() => setIsModalOpen(true)}>Create note</button>
       </div>
 
