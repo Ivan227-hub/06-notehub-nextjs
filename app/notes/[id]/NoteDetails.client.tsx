@@ -16,7 +16,7 @@ export default function NoteDetailsClient({ id }: Props) {
   });
 
   if (isLoading) return <p>Loading, please wait...</p>;
-  if (isError || !data) return <p>Failed to load note</p>;
+  if (isError || !data) return <p>Something went wrong.</p>;
 
   return (
     <div className={css.container}>

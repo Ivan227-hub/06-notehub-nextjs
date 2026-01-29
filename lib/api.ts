@@ -8,16 +8,19 @@ const api = axios.create({
   },
 });
 
+
 export interface FetchNotesResponse {
   notes: Note[];
   totalPages: number;
 }
+
 
 export interface CreateNoteRequest {
   title: string;
   content: string;
   tag: Note["tag"];
 }
+
 
 export const fetchNotes = async (
   page: number = 1,
@@ -34,12 +37,14 @@ export const fetchNoteById = async (id: string): Promise<Note> => {
   return res.data;
 };
 
+
 export const createNote = async (
   note: CreateNoteRequest
 ): Promise<Note> => {
   const res = await api.post<Note>("/notes", note);
   return res.data;
 };
+
 
 export const deleteNoteById = async (id: string): Promise<Note> => {
   const res = await api.delete<Note>(`/notes/${id}`);

@@ -5,11 +5,11 @@ import css from "./NoteDetails.module.css";
 import { notFound } from "next/navigation";
 
 interface Props {
-  params: Promise<{ id: string }>;
+  params: { id: string }; 
 }
 
 export default async function NotePage({ params }: Props) {
-  const { id } = await params;
+  const { id } = params;
   const queryClient = new QueryClient();
 
   try {
@@ -18,7 +18,7 @@ export default async function NotePage({ params }: Props) {
       queryFn: () => fetchNoteById(id),
     });
   } catch {
-    notFound();
+    notFound(); 
   }
 
   return (
