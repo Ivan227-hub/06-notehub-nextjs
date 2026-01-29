@@ -13,6 +13,12 @@ export interface FetchNotesResponse {
   totalPages: number;
 }
 
+export interface CreateNoteRequest {
+  title: string;
+  content: string;
+  tag: Note["tag"];
+}
+
 export const fetchNotes = async (
   page: number = 1,
   search: string = ""
@@ -28,11 +34,9 @@ export const fetchNoteById = async (id: string): Promise<Note> => {
   return res.data;
 };
 
-export const createNote = async (note: {
-  title: string;
-  content: string;
-  tag: Note["tag"];
-}): Promise<Note> => {
+export const createNote = async (
+  note: CreateNoteRequest
+): Promise<Note> => {
   const res = await api.post<Note>("/notes", note);
   return res.data;
 };
